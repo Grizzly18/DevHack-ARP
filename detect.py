@@ -1,6 +1,7 @@
 import os
 import re
 
+
 def arp_spoofing():
     os.system('arp -a > .detector')
     mac_list = []
@@ -18,10 +19,11 @@ def arp_spoofing():
 
 
 def main():
-    if(arp_spoofing()):
+    if arp_spoofing():
         print("BAD")
     else:
         print("GOOD")
+
 
 if __name__ == '__main__':
     main()
