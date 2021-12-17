@@ -8,7 +8,7 @@ def sniff():
 
 def process_sniffed_packet(packet):
     # Проверка является ли пакет ответом на ARP запрос
-    if packet.haslayer(scapy.ARP):
+    if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
         print(packet.show())
 
 
