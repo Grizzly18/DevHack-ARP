@@ -15,7 +15,7 @@ def process_sniffed_packet(packet):
     global dict_ip_mac, set_mac
 
     if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
-        if packet[scapy.ARP].pdst != local_ip:
+        if packet[scapy.ARP].psrc != local_ip:
 
             cur_ip = packet[scapy.ARP].psrc
             cur_mac = packet[scapy.ARP].hwsrc
