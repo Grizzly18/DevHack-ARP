@@ -19,7 +19,7 @@ def sniff():
 
 def process_sniffed_packet(packet):
     if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
-        if packet[scapy.ARP].pscr != local_ip:
+        if packet[scapy.ARP].psrc != local_ip:
             true_mac = get_mac(packet[scapy.ARP].psrc)
             curr_mac = packet[scapy.ARP].hwsrc
             if true_mac != curr_mac:
