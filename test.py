@@ -1,27 +1,24 @@
-import os
-import re
+import scapy.all as scapy 
+ 
+def get_mac(ip):
+    arp_request = scapy.ARP(pdst=ip)
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request_broadcast = broadcast/arp_request
+    answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+    return answered_list[0][1].hwsrc
 
-def arp_spoofing():
-    os.system('arp -a > .detector')
-    mac_list = []
-    with open(".detector", "r") as f:
-        for line in f.readlines()[3:]:
-            if line.split()[3] == "вЁзҐбЄЁ©":
-                continue
-            mac_addr = re.search(r'([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})', line, re.I).group()
-            if mac_addr not in mac_list:
-                mac_list.append(mac_addr)
-            else:
-                return True
-    os.remove(".detector")
-    return False
-
-
-def main():
-    if(arp_spoofing()):
-        print("BAD")
-    else:
-        print("GOOD")
-
-if __name__ == '__main__':
-    main()
+def sniff(): 
+    scapy.sniff(store=False, prn=process_sniffed_packet)  
+ 
+def process_sniffed_packet(packet): 
+    if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2: 
+        try:
+            real_mac = get_mac(packet[scapy.ARP].psrc)
+            responce_mac = packet[scapy.ARP].hwsrc
+            if real_mac != responce_mac:
+                print("Attack!!!!!!!!!!!")
+        except IndexError:
+            pass
+ 
+ 
+sniff()
