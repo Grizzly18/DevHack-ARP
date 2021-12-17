@@ -16,7 +16,7 @@ def process_sniffed_packet(packet):
             real_mac = get_mac(packet[scapy.ARP].psrc)
             responce_mac = packet[scapy.ARP].hwsrc
             if real_mac != responce_mac:
-                print("Attack!!!!!!!!!!!")
+                print("Attack!!!!!!!!!!!!")
         except IndexError:
             pass
  
