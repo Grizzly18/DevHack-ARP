@@ -1,31 +1,23 @@
 from tkinter import *
-import tkinter
 from tkinter.ttk import Checkbutton
-import os
+from Defence import Net
+import scapy.all as scapy
 from sys import platform
+from threading import *
 
 
 def launch():
-    flag_notify = first_var.get()
-    flag_defend = second_var.get()
-    if "win" in platform:
-        window.destroy()
-        os.system(f"python Defence.pyw {int(flag_notify)} {flag_defend}")
-    else:
-        pass
-    exit()
+    messages_flag = first_var.get()
+    defense_flag = second_var.get()
+    for i in scapy.get_if_list():
+        if '{' in i and '}' in i and "win" in platform:
+            Thread(target = Net("\\Device\\NPF_" + i).sniff, daemon=True).start()
+        elif "win" not in platform:
+            Thread(target = Net(i).sniff, daemon=True).start()
 
 
 def kill():
-    if "win" in platform:
-        try:
-            os.system("Taskkill /IM python.exe /F")
-        except:
-            pass
-    else:
-        pass
-    exit()
-
+    window.destroy()
 
 window = Tk()
 N = window.winfo_screenheight()
@@ -54,12 +46,12 @@ second_chk = Checkbutton(window, onvalue=1, offvalue=0, variable=second_var, tex
 second_chk.grid(column=5, row=0)
 
 lbl1 = Label(window)
-lbl1.grid(column=0, row=1)
+lbl1.grid(column=0,row=1)
 
 start_btn = Button(window, text="Start AntiArp", command=launch)
 start_btn.grid(column=1, row=4)
 
-end_btn = Button(window, text="Kill AntiArp", command=kill)
+end_btn = Button(window, text="Stop AntiArp", command=kill)
 end_btn.grid(column=5, row=4)
 
 window.mainloop()
