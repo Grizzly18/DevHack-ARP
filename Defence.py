@@ -1,5 +1,6 @@
 import scapy.all as scapy
 from threading import *
+import os
 from sys import platform
 
 
@@ -19,9 +20,11 @@ class Net:
     def sniff(self):
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
-
     def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
-        scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
+        if "win" in platform:
+            scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
+        else:
+            os.system(f"arp -s {hwsrc} {psrc}")
         
 
     def process_sniffed_packet(self, packet):
