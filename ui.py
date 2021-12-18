@@ -1,23 +1,35 @@
 from tkinter import *
 import tkinter
 from tkinter.ttk import Checkbutton
+import os
+from sys import platform
 
 
 def launch():
-    messages_flag = first_var.get()
-    defense_flag = second_var.get()
-    print(messages_flag, defense_flag)
-    pass
+    flag_notify = first_var.get()
+    flag_defend = second_var.get()
+    if "win" in platform:
+        window.destroy()
+        os.system(f"python Defence.pyw {int(flag_notify)} {flag_defend}")
+    else:
+        pass
+    exit()
 
 
 def kill():
-    pass
+    if "win" in platform:
+        try:
+            os.system("Taskkill /IM python.exe /F")
+        except:
+            pass
+    else:
+        pass
+    exit()
 
 
 window = Tk()
 N = window.winfo_screenheight()
 M = window.winfo_screenwidth()
-print(N, M)
 window.geometry(f"350x250")
 window.title("AntiArp Launcher")
 
@@ -38,12 +50,11 @@ first_chk = Checkbutton(window, onvalue=1, variable=first_var, offvalue=0, text=
 first_chk.grid(column=1, row=0)
 
 second_var = BooleanVar()
-help(Checkbutton)
 second_chk = Checkbutton(window, onvalue=1, offvalue=0, variable=second_var, text='Защитить от атак       ', state=1)
 second_chk.grid(column=5, row=0)
 
 lbl1 = Label(window)
-lbl1.grid(column=0,row=1)
+lbl1.grid(column=0, row=1)
 
 start_btn = Button(window, text="Start AntiArp", command=launch)
 start_btn.grid(column=1, row=4)
