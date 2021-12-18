@@ -46,5 +46,5 @@ if __name__ == '__main__':
     for i in scapy.get_if_list():
         if '{' in i and '}' in i and "win" in platform:
             Thread(target = Net("\\Device\\NPF_" + i).sniff).start()
-        else:
+        elif "win" not in platform:
             Thread(target = Net(i).sniff).start()
