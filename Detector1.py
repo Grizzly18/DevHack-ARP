@@ -1,39 +1,40 @@
 import scapy.all as scapy
+from threading import *
 
 
-local_ip = ""
+class Net:
+    def __init__(self, type):
+        self.local_ip = scapy.get_if_addr(type)
+        self.type = type
 
 
-def get_mac(ip):
-    arp_request = scapy.ARP(pdst=ip)
-    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff:ff:ff")
-    arp_request_broadcast = broadcast/arp_request
-    answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
-    return answered_list[0][1].hwsrc
+    def get_mac(self, ip):
+        arp_request = scapy.ARP(pdst=ip)
+        broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff:ff:ff")
+        arp_request_broadcast = broadcast/arp_request
+        answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+        return answered_list[0][1].hwsrc
 
 
-def sniff():
-    scapy.sniff(iface=scapy.conf.iface, store=False, prn=process_sniffed_packet)
+    def sniff(self):
+        scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
 
-def react_on_attack(ture_mac, curr_ip):
-    print("You are under attack!!")
+    def react_on_attack(self, ture_mac, curr_ip):
+        print("You are under attack!!")
 
 
-def process_sniffed_packet(packet):
-    if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
-        if packet[scapy.ARP].psrc != local_ip:
-            true_mac = get_mac(packet[scapy.ARP].psrc)
-            curr_mac = packet[scapy.ARP].hwsrc
-            if true_mac != curr_mac:
-                react_on_attack(true_mac, packet[scapy.ARP].psrc)
-
-
-def get_local_ip():
-    global local_ip
-    local_ip = scapy.get_if_addr(scapy.conf.iface)
+    def process_sniffed_packet(self, packet):
+        if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
+            if packet[scapy.ARP].psrc != self.local_ip:
+                true_mac = self.get_mac(packet[scapy.ARP].psrc)
+                curr_mac = packet[scapy.ARP].hwsrc
+                if true_mac != curr_mac:
+                    self.react_on_attack(true_mac, packet[scapy.ARP].psrc)
 
 
 if __name__ == '__main__':
-    get_local_ip()
-    sniff()
+    for i in scapy.get_if_list():
+        nn = Net("\\Device\\NPF_" + i)
+        n = Thread(target = nn.sniff)
+        n.start()
