@@ -8,9 +8,12 @@ from threading import *
 import os
 
 attack = False
+messages_flag = False
+defense_flag = False
 
 class MainWindow:
     def __init__(self): 
+        self.have_threads = False
         self.root = Tk()
         self.root.title("AntiArp Launcher")
         self.root.geometry("350x200")
@@ -27,25 +30,27 @@ class MainWindow:
         self.root.mainloop()
 
     def launch(self):
+        global messages_flag, defense_flag
         messages_flag = self.first_var.get()
         defense_flag = self.second_var.get()
-        Label(self.root, text="                                    ", font="Times 20").place(x=50, y=130)
-        Label(self.root, text="Вы под защитой", font="Times 20").place(x=75, y=130)
-        for i in scapy.get_if_list():
-            if '{' in i and '}' in i and "win" in platform:
-                Thread(target = Net("\\Device\\NPF_" + i, messages_flag, defense_flag).sniff, daemon=True).start()
-            elif "win" not in platform:
-                Thread(target = Net(i, messages_flag, defense_flag).sniff, daemon=True).start()
+        if defense_flag or messages_flag:
+            if not self.have_threads:
+                for i in scapy.get_if_list():
+                    if '{' in i and '}' in i and "win" in platform:
+                        Thread(target = Net("\\Device\\NPF_" + i).sniff, daemon=True).start()
+                    elif "win" not in platform:
+                        Thread(target = Net(i).sniff, daemon=True).start()
+            self.have_threads = True
+            Label(self.root, text="                                    ", font="Times 20").place(x=50, y=130)
+            Label(self.root, text="Вы под защитой", font="Times 20").place(x=75, y=130)
 
     def kill(self):
         self.root.destroy()
 
 
 class Net:
-    def __init__(self, type, notify, defend):
+    def __init__(self, type):
         self.type = type
-        self.flag_notify = notify
-        self.flag_defend = defend
 
 
     def get_mac(self, ip):
@@ -66,9 +71,10 @@ class Net:
             mb.showinfo("Attack", 'You are under attack')
 
     def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
-        if self.flag_notify:
+        global messages_flag, defense_flag
+        if messages_flag:
             self.notify()
-        if self.flag_defend:
+        if defense_flag:
             self.defend(hwsrc, psrc, pdst, hwdst)
 
     def defend(self, hwsrc, psrc, pdst, hwdst):
