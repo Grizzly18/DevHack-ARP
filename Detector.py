@@ -1,8 +1,6 @@
-from random import randint
 import scapy.all as scapy
 from threading import *
 from sys import platform
-import os
 
 
 class Net:
@@ -37,12 +35,8 @@ class Net:
 
 
 if __name__ == '__main__':
-    txt = str(scapy.conf.route).split('\n') 
-    all_ifaces = set()
-    for i in range(1, len(txt)):
-        iface, ip1, ip2 = scapy.conf.route.route(txt[i].split()[0])
-        if '{' in iface and '}' in iface:
-            all_ifaces.add(iface)
-    for i in all_ifaces:
-        nn = Net(iface)
-        Thread(target=nn.sniff).start()
+    for i in scapy.get_if_list():
+        if '{' in i and '}' in i and "win" in platform:
+            Thread(target = Net("\\Device\\NPF_" + i).sniff).start()
+        else:
+            Thread(target = Net(i).sniff).start()
