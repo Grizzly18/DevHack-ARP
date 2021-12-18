@@ -22,7 +22,11 @@ class Net:
 
     def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
         if "win" in platform:
-            scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
+            try:
+                while True:
+                    scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
+            except KeyboardInterrupt:
+                pass
         else:
             os.system(f"arp -s {hwsrc} {psrc}")
         
