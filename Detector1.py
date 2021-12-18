@@ -20,9 +20,9 @@ class Net:
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
 
-    def react_on_attack(self, ture_mac, curr_ip):
+    def react_on_attack(self, true_mac, curr_ip):
         print("You are under attack!!")
-
+        
 
     def process_sniffed_packet(self, packet):
         if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
