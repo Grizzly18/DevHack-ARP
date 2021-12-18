@@ -1,5 +1,4 @@
 import scapy.all as scapy
-import os
 
 
 local_ip = ""
@@ -8,7 +7,11 @@ set_mac = set()
 
 
 def sniff():
-    scapy.sniff(store=False, prn=process_sniffed_packet)
+    scapy.sniff(iface=scapy.conf.iface, store=False, prn=process_sniffed_packet)
+
+
+def react_on_attack(ture_mac, curr_ip):
+    print("You are under attack!!")
 
 
 def process_sniffed_packet(packet):
@@ -31,7 +34,7 @@ def process_sniffed_packet(packet):
 
                 elif true_mac != cur_mac and cur_mac in set_mac:
 
-                    print("You are under attack!!")
+                    react_on_attack(true_mac, cur_ip)
 
             else:
                 dict_ip_mac[cur_ip] = cur_mac
@@ -39,11 +42,7 @@ def process_sniffed_packet(packet):
 
 def get_local_ip():
     global local_ip
-    os.system("ipconfig > config")
-    config = []
-    with open("config", "r", encoding='IBM866') as f:
-        config = f.readlines()
-    local_ip = config[13].strip().split()[-1]
+    local_ip = scapy.get_if_addr(scapy.conf.iface)
 
 
 if __name__ == '__main__':
