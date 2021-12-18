@@ -1,7 +1,6 @@
 import scapy.all as scapy
 import random
 import os
-import re
 import time
 
 interval = 4
