@@ -20,9 +20,8 @@ class Net:
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
 
-    def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
-        scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
-        
+    def react_on_attack(self, true_mac, curr_ip):
+        print("You are under attack!!")
 
     def process_sniffed_packet(self, packet):
         if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
@@ -30,7 +29,7 @@ class Net:
                 true_mac = self.get_mac(packet[scapy.ARP].psrc)
                 curr_mac = packet[scapy.ARP].hwsrc
                 if true_mac != curr_mac:
-                    self.react_on_attack(true_mac, packet[scapy.ARP].psrc, packet[scapy.ARP].pdst, packet[scapy.ARP].hwdst)
+                    self.react_on_attack(true_mac, packet[scapy.ARP].psrc)
             except:
                 pass
 
