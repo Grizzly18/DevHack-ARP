@@ -5,8 +5,10 @@ from sys import platform
 
 
 class Net:
-    def __init__(self, type):
+    def __init__(self, type, notify, defend):
         self.type = type
+        self.flag_notify = notify
+        self.flag_defend = defend
 
 
     def get_mac(self, ip):
@@ -20,7 +22,16 @@ class Net:
     def sniff(self):
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
+    def notify(self):
+        print('You are under attack')
+
     def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
+        if self.flag_notify:
+            self.notify()
+        if self.flag_defend:
+            self.defend(hwsrc, psrc, pdst, hwdst)
+
+    def defend(self, hwsrc, psrc, pdst, hwdst):
         if "win" in platform:
             try:
                 while True:
