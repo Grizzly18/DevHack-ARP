@@ -1,5 +1,8 @@
+from random import randint
 import scapy.all as scapy
 from threading import *
+from sys import platform
+import os
 
 
 class Net:
@@ -21,7 +24,6 @@ class Net:
 
     def react_on_attack(self, true_mac, curr_ip):
         print("You are under attack!!")
-        
 
     def process_sniffed_packet(self, packet):
         if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
@@ -35,7 +37,12 @@ class Net:
 
 
 if __name__ == '__main__':
-    for i in scapy.get_if_list():
-        nn = Net("\\Device\\NPF_" + i)
-        n = Thread(target = nn.sniff)
-        n.start()
+    txt = str(scapy.conf.route).split('\n') 
+    all_ifaces = set()
+    for i in range(1, len(txt)):
+        iface, ip1, ip2 = scapy.conf.route.route(txt[i].split()[0])
+        if '{' in iface and '}' in iface:
+            all_ifaces.add(iface)
+    for i in all_ifaces:
+        nn = Net(iface)
+        Thread(target=nn.sniff).start()
