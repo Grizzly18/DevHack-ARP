@@ -1,8 +1,7 @@
-from random import randint
 import scapy.all as scapy
 from threading import *
-from sys import platform
 import os
+from sys import platform
 
 
 class Net:
@@ -21,9 +20,16 @@ class Net:
     def sniff(self):
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
-
-    def react_on_attack(self, true_mac, curr_ip):
-        print("You are under attack!!")
+    def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
+        if "win" in platform:
+            try:
+                while True:
+                    scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
+            except KeyboardInterrupt:
+                pass
+        else:
+            os.system(f"arp -s {hwsrc} {psrc}")
+        
 
     def process_sniffed_packet(self, packet):
         if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
@@ -31,18 +37,14 @@ class Net:
                 true_mac = self.get_mac(packet[scapy.ARP].psrc)
                 curr_mac = packet[scapy.ARP].hwsrc
                 if true_mac != curr_mac:
-                    self.react_on_attack(true_mac, packet[scapy.ARP].psrc)
+                    self.react_on_attack(true_mac, packet[scapy.ARP].psrc, packet[scapy.ARP].pdst, packet[scapy.ARP].hwdst)
             except:
                 pass
 
 
 if __name__ == '__main__':
-    txt = str(scapy.conf.route).split('\n') 
-    all_ifaces = set()
-    for i in range(1, len(txt)):
-        iface, ip1, ip2 = scapy.conf.route.route(txt[i].split()[0])
-        if '{' in iface and '}' in iface:
-            all_ifaces.add(iface)
-    for i in all_ifaces:
-        nn = Net(iface)
-        Thread(target=nn.sniff).start()
+    for i in scapy.get_if_list():
+        if '{' in i and '}' in i and "win" in platform:
+            Thread(target = Net("\\Device\\NPF_" + i).sniff).start()
+        elif "win" not in platform:
+            Thread(target = Net(i).sniff).start()
