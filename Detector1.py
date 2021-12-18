@@ -4,7 +4,6 @@ from threading import *
 
 class Net:
     def __init__(self, type):
-        self.local_ip = scapy.get_if_addr(type)
         self.type = type
 
 
@@ -26,11 +25,13 @@ class Net:
 
     def process_sniffed_packet(self, packet):
         if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
-            if packet[scapy.ARP].psrc != self.local_ip:
+            try:
                 true_mac = self.get_mac(packet[scapy.ARP].psrc)
                 curr_mac = packet[scapy.ARP].hwsrc
                 if true_mac != curr_mac:
                     self.react_on_attack(true_mac, packet[scapy.ARP].psrc)
+            except:
+                pass
 
 
 if __name__ == '__main__':
