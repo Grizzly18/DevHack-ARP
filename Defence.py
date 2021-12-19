@@ -66,7 +66,10 @@ class Net:
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
     def UnderAttack(self):
-        os.system("notify-send Your message Title")
+        if "win"in platform:
+            mb.showinfo("Attack", "You are under attack")
+        else:
+            os.system("notify-send 'Attack' 'You are under attack'")
 
     def notify(self):
         global attack
