@@ -87,7 +87,7 @@ class Net:
     def defend(self, hwsrc, psrc, pdst, hwdst):
         if "win" in platform:
             try:
-                for i in range(1000):
+                while True:
                     self.change_mac_windows(hwsrc, psrc, hwdst, pdst)
             except KeyboardInterrupt:
                 pass
