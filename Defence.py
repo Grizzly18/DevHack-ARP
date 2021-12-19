@@ -65,11 +65,14 @@ class Net:
     def sniff(self):
         scapy.sniff(iface=self.type, store=False, prn=self.process_sniffed_packet)
 
+    def UnderAttack(self):
+        mb.showinfo("Attack", 'You are under attack')   
+
     def notify(self):
         global attack
         if not attack:
             attack = True
-            mb.showinfo("Attack", 'You are under attack')
+            Thread(target = self.UnderAttack).start()
 
     def react_on_attack(self, hwsrc, psrc, pdst, hwdst):
         global messages_flag, defense_flag
@@ -87,7 +90,7 @@ class Net:
     def defend(self, hwsrc, psrc, pdst, hwdst):
         if "win" in platform:
             try:
-                while True:
+                for i in range(1000):
                     self.change_mac_windows(hwsrc, psrc, hwdst, pdst)
             except KeyboardInterrupt:
                 pass
