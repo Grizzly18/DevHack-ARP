@@ -1,35 +1,31 @@
-import os
-import tkinter.messagebox as mb
-from sys import platform
-from threading import *
 from tkinter import *
 from tkinter.ttk import Checkbutton
-
+import tkinter.messagebox as mb
 import scapy.all as scapy
+from sys import platform
+from threading import *
+import os
 
 attack = False
 messages_flag = False
 defense_flag = False
 
-
 class MainWindow:
-    def __init__(self):
+    def __init__(self): 
         self.have_threads = False
         self.root = Tk()
         self.root.title("AntiArp Launcher")
         self.root.geometry("350x200")
         self.root.resizable(width=False, height=False)
         self.first_var = BooleanVar()
-        Checkbutton(self.root, onvalue=1, variable=self.first_var, offvalue=0, text='Сообщить об атаках').place(x=15,
-                                                                                                                y=5)
+        Checkbutton(self.root, onvalue=1, variable=self.first_var, offvalue=0, text='Сообщить об атаках').place(x=15, y=5)
         self.second_var = BooleanVar()
-        self.second_chk = Checkbutton(self.root, onvalue=1, offvalue=0, variable=self.second_var,
-                                      text='Защитить от атак', state=1).place(x=190, y=5)
+        self.second_chk = Checkbutton(self.root, onvalue=1, offvalue=0, variable=self.second_var, text='Защитить от атак', state=1).place(x=190, y=5)
         Label(self.root, text='Start AntiArp', font="Times 14").place(x=10, y=30)
         Label(self.root, text='Stop AntiArp', font="Times 14").place(x=190, y=30)
         Button(self.root, text=' Start ', command=self.launch).place(x=40, y=75)
         Button(self.root, text=' Stop ', command=self.kill).place(x=220, y=75)
-        self.safe = Label(self.root, text="Вы не под защитой", font="Times 20").place(x=60, y=130)
+        Label(self.root, text="Вы не под защитой", font="Times 20").place(x=60, y=130)
         self.root.mainloop()
 
     def launch(self):
@@ -40,12 +36,14 @@ class MainWindow:
             if not self.have_threads:
                 for i in scapy.get_if_list():
                     if '{' in i and '}' in i and "win" in platform:
-                        Thread(target=Net("\\Device\\NPF_" + i).sniff, daemon=True).start()
+                        Thread(target = Net("\\Device\\NPF_" + i).sniff, daemon=True).start()
                     elif "win" not in platform:
-                        Thread(target=Net(i).sniff, daemon=True).start()
+                        Thread(target = Net(i).sniff, daemon=True).start()
             self.have_threads = True
             Label(self.root, text="                                    ", font="Times 20").place(x=50, y=130)
             Label(self.root, text="Вы под защитой", font="Times 20").place(x=75, y=130)
+        else:
+            Label(self.root, text="Вы не под защитой", font="Times 20").place(x=60, y=130)
 
     def kill(self):
         self.root.destroy()
