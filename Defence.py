@@ -82,7 +82,7 @@ class Net:
             self.defend(hwsrc, psrc, pdst, hwdst)
 
     def change_mac_linux(self, psrc, hwsrc):
-        os.system(f"arp -s {psrc} {hwsrc}")
+        os.system(f"sudo arp -s {psrc} {hwsrc}")
 
     def change_mac_windows(self, hwsrc, psrc, hwdst, pdst):
         scapy.sendp(scapy.Ether(src=hwsrc, dst=hwdst) / scapy.ARP(op=2, hwsrc=hwsrc, psrc=psrc, hwdst=hwdst, pdst=pdst))
